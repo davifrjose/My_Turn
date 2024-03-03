@@ -17,3 +17,15 @@ type User struct {
 	Name      string
 	Password  string
 }
+
+type Workspace struct {
+	ID          uuid.UUID
+	CreatedAt   time.Time
+	Name        string
+	Email       string
+	Address     string
+	UserID      uuid.UUID
+	DisplayName string
+	OpeningTime time.Time
+	ClosingTime time.Time
+}

@@ -52,6 +52,7 @@ func main() {
 
 	v1Router := chi.NewRouter()
 	v1Router.Post("/users", apiCfg.handlerUsersCreate)
+	v1Router.Post("/workspaces", apiCfg.handlerWorkSpacesCreate)
 
 	r.Mount("/v1",v1Router)
 

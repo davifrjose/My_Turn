@@ -44,3 +44,20 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	)
 	return i, err
 }
+
+const selectUserById = `-- name: SelectUserById :one
+Select id, created_at, email, name, password from users where id = $1 LIMIT 1
+`
+
+func (q *Queries) SelectUserById(ctx context.Context, id uuid.UUID) (User, error) {
+	row := q.db.QueryRowContext(ctx, selectUserById, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.Email,
+		&i.Name,
+		&i.Password,
+	)
+	return i, err
+}
