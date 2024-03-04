@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"net/http"
 	"time"
@@ -11,13 +12,15 @@ import (
 
 func (cfg *apiConfig) handlerWorkSpacesCreate(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
-		Name string
-		Email string
-		Address string
-		UserID      uuid.UUID
-		DisplayName string
-		OpeningTime time.Time
-		ClosingTime time.Time
+	Name         string     `json:"name"`
+	Email        string     `json:"email"`
+	Address      string     `json:"address"`
+	UserID       uuid.UUID  `json:"user_id"`
+	DisplayName  string     `json:"display_name"`
+	OpeningTime  time.Time  `json:"opening_time"`
+	ClosingTime  time.Time  `json:"closing_time"`
+	Logo         string    `json:"logo"`
+	Description  string    `json:"description"`
 
 	}
 	decoder := json.NewDecoder(r.Body)
@@ -32,6 +35,19 @@ func (cfg *apiConfig) handlerWorkSpacesCreate(w http.ResponseWriter, r *http.Req
 		responseWithError(w, http.StatusInternalServerError, "This user does not exist")
 	}
 
+	description := sql.NullString{}
+	if params.Description != "" {
+		description.String = params.Description
+		description.Valid = true
+	}
+
+	logo := sql.NullString{}
+	if params.Logo != "" {
+		logo.String = params.Logo
+		logo.Valid = true
+	}
+
+
 	workspace, err := cfg.DB.CreateWorkspaces(r.Context(), database.CreateWorkspacesParams{
 		ID: uuid.New(),
 		CreatedAt: time.Now().UTC(),
@@ -42,6 +58,8 @@ func (cfg *apiConfig) handlerWorkSpacesCreate(w http.ResponseWriter, r *http.Req
 		DisplayName: params.DisplayName,
 		OpeningTime: params.OpeningTime,
 		ClosingTime: params.ClosingTime,
+		Logo: logo,
+		Description: description,
 
 	})
 

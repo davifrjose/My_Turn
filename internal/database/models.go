@@ -5,6 +5,7 @@
 package database
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -28,4 +29,6 @@ type Workspace struct {
 	DisplayName string
 	OpeningTime time.Time
 	ClosingTime time.Time
+	Logo        sql.NullString
+	Description sql.NullString
 }

@@ -7,15 +7,16 @@ package database
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
 )
 
 const createWorkspaces = `-- name: CreateWorkspaces :one
-INSERT INTO workspaces (id, created_at, name, email, address, user_id, display_name, opening_time, closing_time)
-VALUES ($1, $2, $3, $4,$5,$6,$7,$8,$9)
-RETURNING id, created_at, name, email, address, user_id, display_name, opening_time, closing_time
+INSERT INTO workspaces (id, created_at, name, email, address, user_id, display_name, opening_time, closing_time,logo,description)
+VALUES ($1, $2, $3, $4,$5,$6,$7,$8,$9,$10,$11)
+RETURNING id, created_at, name, email, address, user_id, display_name, opening_time, closing_time, logo, description
 `
 
 type CreateWorkspacesParams struct {
@@ -28,6 +29,8 @@ type CreateWorkspacesParams struct {
 	DisplayName string
 	OpeningTime time.Time
 	ClosingTime time.Time
+	Logo        sql.NullString
+	Description sql.NullString
 }
 
 func (q *Queries) CreateWorkspaces(ctx context.Context, arg CreateWorkspacesParams) (Workspace, error) {
@@ -41,6 +44,8 @@ func (q *Queries) CreateWorkspaces(ctx context.Context, arg CreateWorkspacesPara
 		arg.DisplayName,
 		arg.OpeningTime,
 		arg.ClosingTime,
+		arg.Logo,
+		arg.Description,
 	)
 	var i Workspace
 	err := row.Scan(
@@ -53,6 +58,8 @@ func (q *Queries) CreateWorkspaces(ctx context.Context, arg CreateWorkspacesPara
 		&i.DisplayName,
 		&i.OpeningTime,
 		&i.ClosingTime,
+		&i.Logo,
+		&i.Description,
 	)
 	return i, err
 }
