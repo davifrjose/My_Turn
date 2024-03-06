@@ -1,5 +1,7 @@
 package model
 
+import "github.com/google/uuid"
+
 type ServiceTypeStatus string
 
 const (
@@ -8,7 +10,7 @@ const (
 )
 
 type ServiceType struct {
-	Id            string
+	Id            uuid.UUID
 	Name          string
 	Code          string
 	Status        ServiceTypeStatus
