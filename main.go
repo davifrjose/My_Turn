@@ -1,70 +1,33 @@
 package main
 
 import (
-	"database/sql"
-	"log"
-	"net/http"
+	"context"
+	"log/slog"
 	"os"
 
-	"github.com/davifrjose/My_Turn/internal/database"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/cors"
-	"github.com/joho/godotenv"
+	"github.com/davifrjose/My_Turn/internal/adapter/config"
+	"github.com/davifrjose/My_Turn/internal/adapter/logger"
+	"github.com/davifrjose/My_Turn/internal/adapter/storage/postgres"
 	_ "github.com/lib/pq"
 )
 
-type apiConfig struct {
-	DB *database.Queries
-}
-
 func main() {
-
-	godotenv.Load(".env")
-	port := os.Getenv("PORT")
-	if port == "" {
-		log.Fatal("PORT environment variable must be set")
-	}
-
-	dbURL := os.Getenv("CONNECTION_STRING")
-	db, err := sql.Open("postgres", dbURL)
+	config, err := config.New()
 	if err != nil {
-		log.Fatal(err)
+		slog.Error("Error loafing env vars", "error", err)
+		os.Exit(1)
 	}
 
-	dbQueries := database.New(db)
+	logger.Set(config.App)
+	slog.Info("Starting the application", "app", config.App.Name, "Env", config.App.Env)
 
-	
-	apiCfg := apiConfig{
-		DB: dbQueries,
-	}
-	
-
-	r := chi.NewRouter()
-
-	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"https://*", "http://*"},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"*"},
-		ExposedHeaders:   []string{"Link"},
-		AllowCredentials: false,
-		MaxAge:           300,
-	}))
-
-	v1Router := chi.NewRouter()
-	v1Router.Post("/users", apiCfg.handlerUsersCreate)
-	v1Router.Post("/workspaces", apiCfg.handlerWorkSpacesCreate)
-
-	r.Mount("/v1",v1Router)
-
-	srv := &http.Server{
-		Addr: ":" + port,
-		Handler: r,
-	}
-
-	log.Printf("Serving on port: %s\n", port)
-	
-	err = srv.ListenAndServe()
+	ctx := context.Background()
+	db, err := postgres.New(ctx, config.DB)
 	if err != nil {
-		log.Fatal(err)
+		slog.Error("Error initializing database connection", "error", err)
+		os.Exit(1)
 	}
+	defer db.Close()
+
+	slog.Info("Successfully connected to the database", "db", config.DB.ConnectionUrl)
 }
