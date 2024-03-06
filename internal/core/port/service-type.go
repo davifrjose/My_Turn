@@ -11,5 +11,12 @@ type ServiceTypeRepository interface {
 }
 
 type ServiceTypeService interface {
-	CreateServiceType(ctx context.Context, serviceType *model.ServiceType) (*model.ServiceType, error)
+	CreateServiceType(ctx context.Context, serviceType *CreateServiceTypeParams) (*model.ServiceType, error)
+}
+
+type CreateServiceTypeParams struct {
+	Name          string
+	Code          string
+	Status        model.ServiceTypeStatus
+	InstitutionId string
 }

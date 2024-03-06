@@ -5,6 +5,7 @@ import (
 
 	"github.com/davifrjose/My_Turn/internal/core/model"
 	"github.com/davifrjose/My_Turn/internal/core/port"
+	"github.com/google/uuid"
 )
 
 type ServiceType struct {
@@ -17,8 +18,14 @@ func NewServiceType(repo port.ServiceTypeRepository) *ServiceType {
 	}
 }
 
-func (serviceType *ServiceType) CreateServiceType(ctx context.Context, serviceTypeParams *model.ServiceType) (*model.ServiceType, error) {
-	serviceTypeResponse, err := serviceType.serviceTypeRepo.CreateServiceType(ctx, serviceTypeParams)
+func (serviceType *ServiceType) CreateServiceType(ctx context.Context, serviceTypeParams *port.CreateServiceTypeParams) (*model.ServiceType, error) {
+	serviceTypeResponse, err := serviceType.serviceTypeRepo.CreateServiceType(ctx, &model.ServiceType{
+		Id:            uuid.New(),
+		Name:          serviceTypeParams.Name,
+		Code:          serviceTypeParams.Code,
+		Status:        serviceTypeParams.Status,
+		InstitutionId: serviceTypeParams.InstitutionId,
+	})
 	if err != nil {
 		if err == model.ErrorConflictingData {
 			return nil, err
