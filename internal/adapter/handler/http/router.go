@@ -39,3 +39,7 @@ func NewRouter(
 		router,
 	}, nil
 }
+
+func (router *Router) Serve(listenAddress string) error {
+	return router.Run(listenAddress)
+}
