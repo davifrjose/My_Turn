@@ -5,5 +5,5 @@ CREATE TABLE "service_types" (
     "name" varchar NOT NULL,
     "code" varchar NOT NULL,
     "status" service_types_status_enum DEFAULT 'active',
-    "institution_id" varchar NOT NULL,
+    "institution_id" varchar NOT NULL
 );

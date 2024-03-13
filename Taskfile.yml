@@ -24,7 +24,7 @@ tasks:
 
   service:up:
     desc: "Start services"
-    cmd: docker-compose up
+    cmd: docker compose up
   
   service:down:
     desc: "Stop services"
