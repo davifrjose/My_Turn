@@ -2,3 +2,9 @@
 out
 
 .env
+
+build/
+dist/
+bin/
+tmp/
+log/
