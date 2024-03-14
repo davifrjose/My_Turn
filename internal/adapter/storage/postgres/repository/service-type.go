@@ -17,9 +17,11 @@ func NewServiceTypeRepository(db *postgres.Db) *ServiceTypeRepository {
 	}
 }
 
-const createServiceTypeQuery = `INSERT INTO categories 
+const createServiceTypeQuery = `INSERT INTO service_types 
 (id, name, code, status, institution_id)
- VALUES ($1, $2, $3, $4, $5)`
+ VALUES ($1, $2, $3, $4, $5)
+ RETURNING *
+ `
 
 func (serviceTypeRepository *ServiceTypeRepository) CreateServiceType(ctx context.Context, serviceType *model.ServiceType) (*model.ServiceType, error) {
 	connection, error := serviceTypeRepository.db.Pool.Acquire(ctx)
@@ -41,9 +43,6 @@ func (serviceTypeRepository *ServiceTypeRepository) CreateServiceType(ctx contex
 		&serviceType.InstitutionId,
 	)
 	if err != nil {
-		if errCode := serviceTypeRepository.db.ErrorCode(err); errCode == "23505" {
-			return nil, model.ErrorConflictingData
-		}
 		return nil, err
 	}
 

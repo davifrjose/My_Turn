@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/davifrjose/My_Turn/internal/core/model"
 	"github.com/davifrjose/My_Turn/internal/core/port"
@@ -27,6 +28,7 @@ func (serviceType *ServiceType) CreateServiceType(ctx context.Context, serviceTy
 		InstitutionId: serviceTypeParams.InstitutionId,
 	})
 	if err != nil {
+		slog.Info(err.Error())
 		if err == model.ErrorConflictingData {
 			return nil, err
 		}
